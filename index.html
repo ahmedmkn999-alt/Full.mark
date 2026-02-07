@@ -3,60 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Full Mark | المنصة الآمنة</title>
-    
+    <title>Full Mark | المنصة</title>
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        /* نفس التصميم النيون */
-        :root { --main: #00e1ff; --bg: #02050a; --card-bg: #0a0f18; --text: #fff; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
-        
+        :root { --main: #00e1ff; --bg: #02050a; --card: #0a0f18; --text: #fff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; -webkit-user-select: none; user-select: none; }
         body { background: linear-gradient(135deg, #02050a 0%, #050a14 100%); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-
         .container { max-width: 1200px; margin: 0 auto; padding: 15px; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; background: rgba(10, 15, 24, 0.95); border-bottom: 2px solid var(--main); padding: 10px 20px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 0 25px rgba(0, 225, 255, 0.15); }
+        header { display: flex; justify-content: space-between; align-items: center; background: rgba(10, 15, 24, 0.95); border-bottom: 2px solid var(--main); padding: 10px 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 0 25px rgba(0, 225, 255, 0.15); }
         .logo { font-size: 1.6rem; font-weight: 900; color: var(--main); text-shadow: 0 0 15px rgba(0, 225, 255, 0.7); }
-        .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(0, 225, 255, 0.3); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        
-        .card { background: var(--card-bg); border: 1px solid rgba(0, 225, 255, 0.15); border-radius: 15px; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .icon-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .nav-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        #backBtn { display: none; background: transparent; color: var(--main); border: 2px solid var(--main); padding: 5px 20px; border-radius: 50px; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        @media(min-width: 768px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; } }
+        .card { background: var(--card); border: 1px solid rgba(0, 225, 255, 0.15); border-radius: 15px; overflow: hidden; cursor: pointer; transition: 0.3s; position: relative; }
         .card:active { transform: scale(0.97); border-color: var(--main); }
-        .card img { width: 100%; height: 160px; object-fit: cover; } /* الصور كاملة */
-        .card-title { padding: 10px; text-align: center; font-weight: bold; background: #0f121a; }
-
-        /* حماية الفيديو */
-        .video-wrapper { position: relative; margin-bottom: 20px; border: 1px solid #333; border-radius: 10px; overflow: hidden; }
-        .watermark { position: absolute; top: 10%; left: 10%; color: rgba(255,255,255,0.3); font-size: 1.5rem; pointer-events: none; z-index: 100; animation: moveWatermark 5s infinite alternate; }
-        @keyframes moveWatermark { from { top: 10%; left: 10%; } to { top: 80%; left: 80%; } }
-
-        /* رسالة الحظر */
-        #security-ban { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index: 99999; color:red; text-align:center; padding-top: 20%; font-size: 2rem; font-weight: bold; }
+        .card img { width: 100%; height: 160px; object-fit: cover; }
+        .card-title { padding: 10px; text-align: center; font-weight: bold; background: #0f121a; border-top: 1px solid #222; }
+        .video-wrapper { background: #000; border-radius: 15px; overflow: hidden; border: 1px solid #333; margin-bottom: 15px; position: relative; }
+        .video-header { padding: 10px; background: #111; color: var(--main); font-weight: bold; text-align: center; }
+        .watermark { position: absolute; top: 20px; left: 20px; color: rgba(255,255,255,0.4); font-family: monospace; font-weight: bold; z-index: 99; pointer-events: none; animation: move 10s infinite alternate; }
+        @keyframes move { 0% {top:10%; left:10%;} 100% {top:80%; left:80%;} }
     </style>
 </head>
-<body oncontextmenu="return false;">
-
-    <div id="security-ban">🚫 تم اكتشاف محاولة اختراق أو VPN 🚫</div>
+<body oncontextmenu="return false">
 
     <div class="container">
         <header>
             <div class="logo">FULL MARK</div>
-            <div style="display:flex; gap:10px">
+            <div style="display:flex; gap:10px;">
                 <div class="icon-btn" onclick="location.reload()"><i class="fas fa-sync"></i></div>
-                <div class="icon-btn" style="color:red; border-color:red" onclick="logout()"><i class="fas fa-power-off"></i></div>
+                <div class="icon-btn" style="color:red; border:1px solid red;" onclick="logout()"><i class="fas fa-power-off"></i></div>
             </div>
         </header>
 
-        <h2 id="pageTitle" style="color:var(--main); margin-bottom:20px; border-right:4px solid var(--main); padding-right:10px;">المواد الدراسية</h2>
-        <button id="backBtn" onclick="goBack()" style="display:none; background:transparent; color:#fff; border:1px solid var(--main); padding:5px 15px; margin-bottom:15px; border-radius:20px;">رجوع</button>
-
-        <div id="gridArea" class="grid">
-            <div style="text-align:center; width:100%; color:#888;">جاري الاتصال بالسيرفر المؤمن...</div>
+        <div class="nav-bar">
+            <h2 id="pageTitle">المواد الدراسية</h2>
+            <button id="backBtn" onclick="goBack()">🔙 رجوع</button>
         </div>
+        
+        <div id="gridArea" class="grid"></div>
+        <div style="height: 50px;"></div>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
@@ -65,135 +55,173 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // 1. نظام الحماية المتقدم
-        setInterval(function() {
-            // منع أدوات المطور
-            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
-                document.body.innerHTML = "Security Violation Detected";
-                window.location.href = "about:blank";
-            }
-        }, 1000);
-
-        // كشف VPN (تقريبي)
-        fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
-            // لو السيرفر اكتشف إنه بروكسي (دي بتحتاج API مدفوع للدقة 100% بس دي بداية)
-            // هنا هنعتمد على التايم زون لو مش مصر مثلاً
-            if(data.country_code !== 'EG') {
-                // alert('يرجى إغلاق الـ VPN للمتابعة'); // فعل السطر ده لو عايز تقفل على اللي بره مصر
-            }
-        });
-
-        // 2. الفايربيز
         const firebaseConfig = { apiKey: "AIzaSyBKY38XHjmC-iGqGrQio_YZ_i1iaIaE2Ds", authDomain: "full-mark-8d434.firebaseapp.com", projectId: "full-mark-8d434", storageBucket: "full-mark-8d434.firebasestorage.app", messagingSenderId: "802579483999", appId: "1:802579483999:web:cf73136ffbd75d5e0ebaea" };
         firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
 
-        // 3. المنطق الديناميكي
+        // 1. الداتا الأصلية (الصور والمدرسين)
+        let ALL_DATA = [
+            {
+                name: "اللغة العربية", img: "https://i.postimg.cc/L6xvnk5X/mn-awl-mn-tklm-allght-alʿrbyt.jpg",
+                teachers: [{ name: "أ. محمد صلاح", img: "https://files.coursatk.online/images/questions/abc2fcc42883dd1a9e93021922da73dc92ff4b40ec76.jpg", chapters: [] }, { name: "أ. رضا الفاروق", img: "https://i.postimg.cc/c4Pg965p/1723904748-y-CL9UA.png", chapters: [] }]
+            },
+            {
+                name: "اللغة الإنجليزية", img: "https://i.postimg.cc/TwvBCjry/characteristics-of-a-prestigious-language-school-1-1020x642-1.jpg",
+                teachers: [{ name: "عبقري لغة", img: "https://files.coursatk.online/images/content/cc3fbcdbba91a2ed893fa92228b089a50eeced1fa245.jpg", chapters: [{chapter_name:"Unit 7", videos:[{name:"لعبة كلمات", link:"https://river-3-345.rtbcdn.ru/hls-vod/oYl6bYGCWxjkkzOTjczQeQ/1770554251/1879/0x5000c500e53a27da/9d1a971b866f4bd081ea784b13680871.mp4.m3u8"}]}] }, { name: "شريف المصري", img: "https://i.postimg.cc/4nRGtCBW/loginbg.png", chapters: [] }]
+            },
+            {
+                name: "الكيمياء", img: "https://static.vecteezy.com/system/resources/previews/014/472/954/original/chemistry-logo-template-illustration-free-vector.jpg",
+                teachers: [
+                    { 
+                        name: "أ. محمد عبدالجواد", img: "https://files.coursatk.online/images/questions/23b4ebea27532d1d05b2f7de5f26e63add3e4ca8ffcd.jpg", 
+                        chapters: [
+                            { chapter_name: "الأساسيات", videos: [{name:"التأسيس", link:"https://river-5-533.rtbcdn.ru/hls-vod/iSmUdDzLxKk8Ln_4GDlIpQ/1770394615/3402/0x5000c500fa6e9016/dda8cd611e33417f84af22dfc71c0a91.mp4.m3u8"}] },
+                            { chapter_name: "الباب الأول", videos: [{name:"المحاضرة 1", link:"https://river-3-301.rtbcdn.ru/hls-vod/bbMBvuDTTcLPLma86u5TfA/1770408256/2636/0x5000039ce868ef9d/a267d076ca524d73a4c80f7f69eb6689.mp4.m3u8"}] }
+                        ] 
+                    }
+                ]
+            },
+            {
+                name: "الأحياء", img: "https://files.coursatk.online/images/content/a47130a2b11a514a2dbb766013d8e9f24701aae245ee.jpg",
+                teachers: [{ name: "د.احمد الجوهري", img: "https://files.coursatk.online/images/content/a47130a2b11a514a2dbb766013d8e9f24701aae245ee.jpg", chapters: [{chapter_name:"المناعة", videos:[{name:"المناعة في النبات", link:"https://river-5-558.rtbcdn.ru/hls-vod/bF_chMQsNTvg_V7-VbQCjg/1770501574/2646/0x5000039ce83a1935/810eac247fde4049b986dcc6a930358d.mp4.m3u8"}]}] }]
+            },
+            {
+                name: "اللغات الثانية", img: "https://cdn-icons-png.flaticon.com/512/3898/3898082.png",
+                teachers: [{ name: "فرنساوي", img: "https://i.postimg.cc/NjRcy2s0/a75e136b-7909-485f-95e8-862fddd2c0bc.png", type:"yt", chapters:[{chapter_name:"تأسيس", videos:[{name:"تأسيس 1", link:"3PC1fxpp-Xk"}]}] }]
+            }
+        ];
+
+        // 2. دمج الداتا الجديدة من الفايربيز (لوحة التحكم)
+        async function loadAndMerge() {
+            try {
+                const snap = await db.collection('new_videos').get();
+                snap.forEach(doc => {
+                    const v = doc.data();
+                    // البحث عن المادة
+                    let sub = ALL_DATA.find(s => s.name === v.subject);
+                    if(!sub) {
+                        sub = { name: v.subject, img: v.subImg || "https://cdn-icons-png.flaticon.com/512/2997/2997380.png", teachers: [] };
+                        ALL_DATA.push(sub);
+                    }
+                    // البحث عن المدرس
+                    let teacher = sub.teachers.find(t => t.name === v.teacher);
+                    if(!teacher) {
+                        teacher = { name: v.teacher, img: v.techImg || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", chapters: [] };
+                        sub.teachers.push(teacher);
+                    }
+                    // البحث عن الكورس
+                    let chapter = teacher.chapters.find(c => c.chapter_name === v.course);
+                    if(!chapter) {
+                        chapter = { chapter_name: v.course, videos: [] };
+                        teacher.chapters.push(chapter);
+                    }
+                    // إضافة الفيديو
+                    chapter.videos.push({ name: v.videoName, link: v.videoLink });
+                });
+                renderSubjects();
+            } catch(e) {
+                console.error("Error loading extra data", e);
+                renderSubjects(); // اعرض اللي موجود وخلاص
+            }
+        }
+
+        // 3. العرض
         const grid = document.getElementById('gridArea');
         const title = document.getElementById('pageTitle');
         const back = document.getElementById('backBtn');
         let viewStack = [];
-        let CACHED_DATA = []; // هنا هنخزن الداتا اللي جاية من الأدمن
 
-        // تحميل البيانات من الفايربيز (بدل الملف)
-        function loadContent() {
-            db.collection('subjects').get().then(snap => {
-                CACHED_DATA = [];
-                snap.forEach(doc => {
-                    CACHED_DATA.push(doc.data());
-                });
-                renderSubjects();
-            });
-        }
-
-        function createCard(text, img, onclick) {
-            return `
-            <div class="card" onclick="${onclick}">
+        function createCard(title, img, onclick) {
+            return `<div class="card" onclick="${onclick}">
                 <img src="${img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2997/2997380.png'">
-                <div class="card-title">${text}</div>
+                <div class="card-title">${title}</div>
             </div>`;
         }
 
-        // عرض المواد
         function renderSubjects() {
             title.innerText = "المواد الدراسية";
             back.style.display = 'none';
-            grid.className = 'grid';
             viewStack = [{type: 'subjects'}];
-            
-            if(CACHED_DATA.length === 0) {
-                grid.innerHTML = '<div style="text-align:center; width:100%;">لا يوجد مواد مضافة بعد</div>';
-                return;
-            }
-            grid.innerHTML = CACHED_DATA.map((sub, i) => createCard(sub.name, sub.img, `renderTeachers(${i})`)).join('');
+            grid.className = 'grid';
+            grid.innerHTML = ALL_DATA.map((sub, i) => createCard(sub.name, sub.img, `renderTeachers(${i})`)).join('');
         }
 
-        // عرض المدرسين
-        window.renderTeachers = function(subIdx) {
-            const sub = CACHED_DATA[subIdx];
+        window.renderTeachers = function(idx) {
+            const sub = ALL_DATA[idx];
             title.innerText = sub.name;
             back.style.display = 'block';
-            viewStack.push({type: 'teachers', subIdx});
-            
-            grid.innerHTML = sub.teachers.map((t, i) => createCard(t.name, t.img, `renderCourses(${subIdx}, ${i})`)).join('');
-        }
+            viewStack.push({type: 'teachers', idx});
+            grid.innerHTML = sub.teachers.map((t, i) => createCard(t.name, t.img, `renderChapters(${idx}, ${i})`)).join('');
+        };
 
-        // عرض الكورسات (الفصول)
-        window.renderCourses = function(subIdx, techIdx) {
-            const teacher = CACHED_DATA[subIdx].teachers[techIdx];
+        window.renderChapters = function(subIdx, teachIdx) {
+            const teacher = ALL_DATA[subIdx].teachers[teachIdx];
             title.innerText = teacher.name;
-            viewStack.push({type: 'courses', subIdx, techIdx});
+            viewStack.push({type: 'chapters', subIdx, teachIdx});
             
-            grid.innerHTML = teacher.courses.map((c, i) => createCard(c.name, teacher.img, `renderVideos(${subIdx}, ${techIdx}, ${i})`)).join('');
-        }
+            if(teacher.type === 'yt') { // لو لغات تانية (يوتيوب)
+                 renderVideos(subIdx, teachIdx, 0); // اعرض اول فصل علطول
+                 return;
+            }
 
-        // عرض الفيديوهات
-        window.renderVideos = function(subIdx, techIdx, courseIdx) {
-            const course = CACHED_DATA[subIdx].teachers[techIdx].courses[courseIdx];
-            title.innerText = course.name;
+            if(!teacher.chapters || teacher.chapters.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;width:100%;color:#777;margin-top:50px;">قريباً</div>';
+                return;
+            }
+            grid.innerHTML = teacher.chapters.map((c, i) => createCard(c.chapter_name, teacher.img, `renderVideos(${subIdx}, ${teachIdx}, ${i})`)).join('');
+        };
+
+        window.renderVideos = function(subIdx, teachIdx, chapIdx) {
+            const teacher = ALL_DATA[subIdx].teachers[teachIdx];
+            const chapter = teacher.chapters[chapIdx];
+            title.innerText = chapter.chapter_name;
             viewStack.push({type: 'videos'});
-            grid.className = 'video-list'; // قائمة تحت بعض
+            grid.className = 'video-list';
             
             const userCode = localStorage.getItem('fullmark_user');
 
-            grid.innerHTML = course.videos.map((v, i) => `
+            grid.innerHTML = chapter.videos.map((v, i) => `
                 <div class="video-wrapper">
-                    <div style="padding:10px; background:#111; color:#00e1ff;">${v.name}</div>
+                    <div class="video-header">${v.name}</div>
                     <div class="plyr__video-embed">
-                        <video id="player-${i}" controls crossorigin playsinline style="width:100%"></video>
+                        ${v.link.includes('http') && !v.link.includes('youtu') ? 
+                        `<video id="player-${i}" controls crossorigin playsinline style="width:100%"></video>` : 
+                        `<iframe src="https://www.youtube.com/embed/${v.link}?origin=https://plyr.io&iv_load_policy=3&modestbranding=1&playsinline=1&showinfo=0&rel=0&enablejsapi=1" allowfullscreen allowtransparency allow="autoplay"></iframe>`
+                        }
                         <div class="watermark">${userCode}</div>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
 
+            // تشغيل HLS
             setTimeout(() => {
-                course.videos.forEach((v, i) => {
-                    const video = document.getElementById(`player-${i}`);
-                    if (Hls.isSupported()) {
-                        const hls = new Hls();
-                        hls.loadSource(v.link);
-                        hls.attachMedia(video);
-                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                        video.src = v.link;
+                chapter.videos.forEach((v, i) => {
+                    if (v.link.includes('.m3u8')) {
+                        const video = document.getElementById(`player-${i}`);
+                        if (Hls.isSupported()) {
+                            const hls = new Hls(); hls.loadSource(v.link); hls.attachMedia(video);
+                        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                            video.src = v.link;
+                        }
+                        new Plyr(video);
                     }
-                    new Plyr(video, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'] });
                 });
             }, 500);
-        }
+        };
 
         window.goBack = function() {
-            viewStack.pop();
-            const prev = viewStack[viewStack.length - 1];
-            if(prev.type === 'subjects') renderSubjects();
-            else if(prev.type === 'teachers') renderTeachers(prev.subIdx);
-            else if(prev.type === 'courses') renderCourses(prev.subIdx, prev.techIdx);
-        }
+            if(viewStack.length > 1) {
+                viewStack.pop();
+                const prev = viewStack[viewStack.length - 1];
+                if(prev.type === 'subjects') renderSubjects();
+                else if(prev.type === 'teachers') renderTeachers(prev.idx);
+                else if(prev.type === 'chapters') renderChapters(prev.subIdx, prev.teachIdx);
+            }
+        };
 
-        function logout() { localStorage.removeItem('fullmark_user'); window.location.href="login.html"; }
+        function logout(){ localStorage.removeItem('fullmark_user'); window.location.href="login.html"; }
 
         if(!localStorage.getItem('fullmark_user')) window.location.href="login.html";
         
-        loadContent(); // تشغيل
+        loadAndMerge(); // تشغيل
     </script>
 </body>
-      </html>
-      
+</html>
