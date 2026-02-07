@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | Full Mark</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --main: #00e1ff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1a2332 0%, #000000 100%); overflow: hidden; }
+        
+        .login-card { background: rgba(20, 20, 30, 0.8); border: 1px solid rgba(0, 225, 255, 0.3); padding: 40px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 40px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .logo { font-size: 2.5rem; font-weight: 900; color: #fff; margin-bottom: 10px; text-shadow: 0 0 15px var(--main); }
+        .input-group { position: relative; margin: 20px 0; }
+        input { width: 100%; padding: 15px; background: #0a0a0a; border: 2px solid #333; border-radius: 50px; color: #fff; text-align: center; font-size: 1.2rem; outline: none; }
+        input:focus { border-color: var(--main); box-shadow: 0 0 15px rgba(0, 225, 255, 0.2); }
+        button { width: 100%; padding: 15px; background: linear-gradient(90deg, #00e1ff, #0088ff); color: #000; border: none; border-radius: 50px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--main); }
+        .msg { margin-top: 15px; color: #ff4444; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo">FULL MARK</div>
+        <div class="input-group">
+            <input type="text" id="code" placeholder="أدخل كود التفعيل" autocomplete="off">
+        </div>
+        <button onclick="login()">دخول</button>
+        <div id="msg" class="msg"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyBKY38XHjmC-iGqGrQio_YZ_i1iaIaE2Ds", authDomain: "full-mark-8d434.firebaseapp.com", projectId: "full-mark-8d434", storageBucket: "full-mark-8d434.firebasestorage.app", messagingSenderId: "802579483999", appId: "1:802579483999:web:cf73136ffbd75d5e0ebaea" };
+        firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
+
+        // لو مسجل قبل كدة يدخل علطول
+        if(localStorage.getItem('fullmark_user')) window.location.href = "index.html";
+
+        function login() {
+            const code = document.getElementById('code').value.trim();
+            const msg = document.getElementById('msg');
+            const btn = document.querySelector('button');
+
+            if(!code) { msg.innerText = "اكتب الكود!"; return; }
+            btn.innerHTML = 'جاري التحقق...';
+
+            db.collection('codes').where('code', '==', code).get().then(snap => {
+                if(snap.empty) {
+                    msg.innerText = "الكود غير صحيح";
+                    btn.innerHTML = "دخول";
+                } else {
+                    localStorage.setItem('fullmark_user', code);
+                    window.location.href = "index.html";
+                }
+            }).catch(e => {
+                msg.innerText = "تأكد من الإنترنت";
+                btn.innerHTML = "دخول";
+            });
+        }
+    </script>
+</body>
+</html>
