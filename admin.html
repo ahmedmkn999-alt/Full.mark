@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المحتوى | Full Mark</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050505; color: #fff; font-family: 'Cairo'; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #111; padding: 20px; border-radius: 15px; border: 1px solid #333; }
+        h2 { text-align: center; color: #00e1ff; margin-bottom: 20px; }
+        
+        label { display: block; margin-top: 10px; color: #aaa; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; background: #000; border: 1px solid #444; color: #fff; border-radius: 5px; outline: none; }
+        input:focus { border-color: #00e1ff; }
+        
+        button { width: 100%; padding: 15px; margin-top: 20px; background: #00e1ff; color: #000; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 1.1rem; }
+        button:hover { background: #fff; }
+
+        .msg { text-align: center; margin-top: 15px; font-weight: bold; }
+        .success { color: #00ff88; }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🎥 إضافة فيديو جديد</h2>
+        
+        <label>1. اسم المادة</label>
+        <input type="text" id="subName" list="subList" placeholder="مثال: الكيمياء">
+        <datalist id="subList">
+            <option value="اللغة العربية">
+            <option value="الكيمياء">
+            <option value="الفيزياء">
+            <option value="الأحياء">
+        </datalist>
+
+        <label>صورة المادة (رابط)</label>
+        <input type="text" id="subImg" placeholder="رابط صورة المادة">
+
+        <label>2. اسم المدرس</label>
+        <input type="text" id="techName" placeholder="مثال: أ. محمد عبدالجواد">
+        
+        <label>صورة المدرس (رابط)</label>
+        <input type="text" id="techImg" placeholder="رابط صورة المدرس">
+
+        <label>3. اسم الكورس / الفصل</label>
+        <input type="text" id="courseName" placeholder="مثال: الباب الأول - أو - مسألتين كل يوم">
+
+        <label>4. عنوان الفيديو</label>
+        <input type="text" id="vidName" placeholder="مثال: المحاضرة الأولى">
+
+        <label>5. رابط الفيديو (m3u8)</label>
+        <input type="text" id="vidLink" placeholder="https://...">
+
+        <button onclick="addVideo()">إضافة الفيديو للمنصة</button>
+        <div id="msg" class="msg"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyBKY38XHjmC-iGqGrQio_YZ_i1iaIaE2Ds", authDomain: "full-mark-8d434.firebaseapp.com", projectId: "full-mark-8d434", storageBucket: "full-mark-8d434.firebasestorage.app", messagingSenderId: "802579483999", appId: "1:802579483999:web:cf73136ffbd75d5e0ebaea" };
+        firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
+
+        async function addVideo() {
+            const btn = document.querySelector('button');
+            const msg = document.getElementById('msg');
+            
+            const subName = document.getElementById('subName').value.trim();
+            const subImg = document.getElementById('subImg').value.trim() || 'https://cdn-icons-png.flaticon.com/512/2997/2997380.png';
+            const techName = document.getElementById('techName').value.trim();
+            const techImg = document.getElementById('techImg').value.trim() || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+            const courseName = document.getElementById('courseName').value.trim();
+            const vidName = document.getElementById('vidName').value.trim();
+            const vidLink = document.getElementById('vidLink').value.trim();
+
+            if(!subName || !techName || !courseName || !vidName || !vidLink) {
+                msg.className = 'msg error'; msg.innerText = "كل البيانات مطلوبة!"; return;
+            }
+
+            btn.disabled = true; btn.innerText = "جاري الإضافة...";
+
+            try {
+                // 1. نبحث عن المادة
+                const subRef = db.collection('subjects').doc(subName);
+                const doc = await subRef.get();
+                let data = doc.exists ? doc.data() : { name: subName, img: subImg, teachers: [] };
+
+                // 2. نبحث عن المدرس
+                let teacher = data.teachers.find(t => t.name === techName);
+                if (!teacher) {
+                    teacher = { name: techName, img: techImg, courses: [] };
+                    data.teachers.push(teacher);
+                }
+
+                // 3. نبحث عن الكورس
+                let course = teacher.courses.find(c => c.name === courseName);
+                if (!course) {
+                    course = { name: courseName, videos: [] };
+                    teacher.courses.push(course);
+                }
+
+                // 4. نضيف الفيديو
+                course.videos.push({ name: vidName, link: vidLink });
+
+                // 5. حفظ في الفايربيز
+                await subRef.set(data);
+
+                msg.className = 'msg success'; msg.innerText = "تمت الإضافة بنجاح! الفيديو نزل في المنصة.";
+                // تنظيف خانات الفيديو فقط عشان لو هتضيف فيديو تاني لنفس الكورس
+                document.getElementById('vidName').value = '';
+                document.getElementById('vidLink').value = '';
+
+            } catch (err) {
+                console.error(err);
+                msg.className = 'msg error'; msg.innerText = "حدث خطأ: " + err.message;
+            }
+            btn.disabled = false; btn.innerText = "إضافة الفيديو للمنصة";
+        }
+    </script>
+</body>
+</html>
