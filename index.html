@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Full Mark | المنصة الآمنة</title>
+    
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* نفس التصميم النيون */
+        :root { --main: #00e1ff; --bg: #02050a; --card-bg: #0a0f18; --text: #fff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        
+        body { background: linear-gradient(135deg, #02050a 0%, #050a14 100%); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 15px; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; background: rgba(10, 15, 24, 0.95); border-bottom: 2px solid var(--main); padding: 10px 20px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 0 25px rgba(0, 225, 255, 0.15); }
+        .logo { font-size: 1.6rem; font-weight: 900; color: var(--main); text-shadow: 0 0 15px rgba(0, 225, 255, 0.7); }
+        .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(0, 225, 255, 0.3); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        
+        .card { background: var(--card-bg); border: 1px solid rgba(0, 225, 255, 0.15); border-radius: 15px; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .card:active { transform: scale(0.97); border-color: var(--main); }
+        .card img { width: 100%; height: 160px; object-fit: cover; } /* الصور كاملة */
+        .card-title { padding: 10px; text-align: center; font-weight: bold; background: #0f121a; }
+
+        /* حماية الفيديو */
+        .video-wrapper { position: relative; margin-bottom: 20px; border: 1px solid #333; border-radius: 10px; overflow: hidden; }
+        .watermark { position: absolute; top: 10%; left: 10%; color: rgba(255,255,255,0.3); font-size: 1.5rem; pointer-events: none; z-index: 100; animation: moveWatermark 5s infinite alternate; }
+        @keyframes moveWatermark { from { top: 10%; left: 10%; } to { top: 80%; left: 80%; } }
+
+        /* رسالة الحظر */
+        #security-ban { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index: 99999; color:red; text-align:center; padding-top: 20%; font-size: 2rem; font-weight: bold; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="security-ban">🚫 تم اكتشاف محاولة اختراق أو VPN 🚫</div>
+
+    <div class="container">
+        <header>
+            <div class="logo">FULL MARK</div>
+            <div style="display:flex; gap:10px">
+                <div class="icon-btn" onclick="location.reload()"><i class="fas fa-sync"></i></div>
+                <div class="icon-btn" style="color:red; border-color:red" onclick="logout()"><i class="fas fa-power-off"></i></div>
+            </div>
+        </header>
+
+        <h2 id="pageTitle" style="color:var(--main); margin-bottom:20px; border-right:4px solid var(--main); padding-right:10px;">المواد الدراسية</h2>
+        <button id="backBtn" onclick="goBack()" style="display:none; background:transparent; color:#fff; border:1px solid var(--main); padding:5px 15px; margin-bottom:15px; border-radius:20px;">رجوع</button>
+
+        <div id="gridArea" class="grid">
+            <div style="text-align:center; width:100%; color:#888;">جاري الاتصال بالسيرفر المؤمن...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // 1. نظام الحماية المتقدم
+        setInterval(function() {
+            // منع أدوات المطور
+            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
+                document.body.innerHTML = "Security Violation Detected";
+                window.location.href = "about:blank";
+            }
+        }, 1000);
+
+        // كشف VPN (تقريبي)
+        fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
+            // لو السيرفر اكتشف إنه بروكسي (دي بتحتاج API مدفوع للدقة 100% بس دي بداية)
+            // هنا هنعتمد على التايم زون لو مش مصر مثلاً
+            if(data.country_code !== 'EG') {
+                // alert('يرجى إغلاق الـ VPN للمتابعة'); // فعل السطر ده لو عايز تقفل على اللي بره مصر
+            }
+        });
+
+        // 2. الفايربيز
+        const firebaseConfig = { apiKey: "AIzaSyBKY38XHjmC-iGqGrQio_YZ_i1iaIaE2Ds", authDomain: "full-mark-8d434.firebaseapp.com", projectId: "full-mark-8d434", storageBucket: "full-mark-8d434.firebasestorage.app", messagingSenderId: "802579483999", appId: "1:802579483999:web:cf73136ffbd75d5e0ebaea" };
+        firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
+
+        // 3. المنطق الديناميكي
+        const grid = document.getElementById('gridArea');
+        const title = document.getElementById('pageTitle');
+        const back = document.getElementById('backBtn');
+        let viewStack = [];
+        let CACHED_DATA = []; // هنا هنخزن الداتا اللي جاية من الأدمن
+
+        // تحميل البيانات من الفايربيز (بدل الملف)
+        function loadContent() {
+            db.collection('subjects').get().then(snap => {
+                CACHED_DATA = [];
+                snap.forEach(doc => {
+                    CACHED_DATA.push(doc.data());
+                });
+                renderSubjects();
+            });
+        }
+
+        function createCard(text, img, onclick) {
+            return `
+            <div class="card" onclick="${onclick}">
+                <img src="${img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2997/2997380.png'">
+                <div class="card-title">${text}</div>
+            </div>`;
+        }
+
+        // عرض المواد
+        function renderSubjects() {
+            title.innerText = "المواد الدراسية";
+            back.style.display = 'none';
+            grid.className = 'grid';
+            viewStack = [{type: 'subjects'}];
+            
+            if(CACHED_DATA.length === 0) {
+                grid.innerHTML = '<div style="text-align:center; width:100%;">لا يوجد مواد مضافة بعد</div>';
+                return;
+            }
+            grid.innerHTML = CACHED_DATA.map((sub, i) => createCard(sub.name, sub.img, `renderTeachers(${i})`)).join('');
+        }
+
+        // عرض المدرسين
+        window.renderTeachers = function(subIdx) {
+            const sub = CACHED_DATA[subIdx];
+            title.innerText = sub.name;
+            back.style.display = 'block';
+            viewStack.push({type: 'teachers', subIdx});
+            
+            grid.innerHTML = sub.teachers.map((t, i) => createCard(t.name, t.img, `renderCourses(${subIdx}, ${i})`)).join('');
+        }
+
+        // عرض الكورسات (الفصول)
+        window.renderCourses = function(subIdx, techIdx) {
+            const teacher = CACHED_DATA[subIdx].teachers[techIdx];
+            title.innerText = teacher.name;
+            viewStack.push({type: 'courses', subIdx, techIdx});
+            
+            grid.innerHTML = teacher.courses.map((c, i) => createCard(c.name, teacher.img, `renderVideos(${subIdx}, ${techIdx}, ${i})`)).join('');
+        }
+
+        // عرض الفيديوهات
+        window.renderVideos = function(subIdx, techIdx, courseIdx) {
+            const course = CACHED_DATA[subIdx].teachers[techIdx].courses[courseIdx];
+            title.innerText = course.name;
+            viewStack.push({type: 'videos'});
+            grid.className = 'video-list'; // قائمة تحت بعض
+            
+            const userCode = localStorage.getItem('fullmark_user');
+
+            grid.innerHTML = course.videos.map((v, i) => `
+                <div class="video-wrapper">
+                    <div style="padding:10px; background:#111; color:#00e1ff;">${v.name}</div>
+                    <div class="plyr__video-embed">
+                        <video id="player-${i}" controls crossorigin playsinline style="width:100%"></video>
+                        <div class="watermark">${userCode}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            setTimeout(() => {
+                course.videos.forEach((v, i) => {
+                    const video = document.getElementById(`player-${i}`);
+                    if (Hls.isSupported()) {
+                        const hls = new Hls();
+                        hls.loadSource(v.link);
+                        hls.attachMedia(video);
+                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                        video.src = v.link;
+                    }
+                    new Plyr(video, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'] });
+                });
+            }, 500);
+        }
+
+        window.goBack = function() {
+            viewStack.pop();
+            const prev = viewStack[viewStack.length - 1];
+            if(prev.type === 'subjects') renderSubjects();
+            else if(prev.type === 'teachers') renderTeachers(prev.subIdx);
+            else if(prev.type === 'courses') renderCourses(prev.subIdx, prev.techIdx);
+        }
+
+        function logout() { localStorage.removeItem('fullmark_user'); window.location.href="login.html"; }
+
+        if(!localStorage.getItem('fullmark_user')) window.location.href="login.html";
+        
+        loadContent(); // تشغيل
+    </script>
+</body>
+      </html>
+      
